@@ -1,0 +1,15 @@
+{
+    "name": "anunatak/framework",
+    "autoload": {
+        "psr-4": {
+            "Anunatak\\AnunaFramework\\": "src/"
+        }
+    },
+    "require": {
+        "tareq1988/wp-eloquent": "dev-master",
+        "altorouter/altorouter": "1.1.0",
+        "twig/twig": "~1.0",
+        "tareq1988/wordpress-settings-api-class": "dev-master",
+        "gizburdt/cuztom": "^2.9"
+    }
+}
