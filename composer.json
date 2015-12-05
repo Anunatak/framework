@@ -1,8 +1,9 @@
 {
     "name": "anunatak/framework",
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "Anunatak\\AnunaFramework\\": "src/"
+            "Anunatak\\Framework\\": "src/"
         }
     },
     "require": {
