@@ -2,6 +2,6 @@
 
 namespace Anunatak\Framework\Models;
 
-namespace WordPress\ORM\Model\User as UserModel;
+namespace WeDevs\ORM\WP\User as UserModel;
 
 class User extends UserModel {}

@@ -2,6 +2,6 @@
 
 namespace Anunatak\Framework\Models;
 
-namespace WordPress\ORM\Model\Post as PostModel;
+namespace WeDevs\ORM\WP\Post as PostModel;
 
 class Post extends PostModel {}

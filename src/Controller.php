@@ -20,13 +20,19 @@ class Controller {
 	 * Settings for the admin page
 	 * @var array
 	 */
-	protected $admin_pages = array();
+	protected $admin_page = array();
 
 	/**
 	 * Admin sub pages
 	 * @var array
 	 */
 	protected $admin_sub_pages = array();
+
+	/**
+	 * Admin pages
+	 * @var array
+	 */
+	protected $admin_pages = array();
 
 	/**
 	 * Scripts
@@ -48,10 +54,10 @@ class Controller {
 	{
 		$this->assets_path = Framework::getUrl() . 'resources/assets/';
 		if($this->type === 'admin') {
-			add_action('admin_menu', array($this, 'admin_page'));
+			add_action('admin_menu', array($this, 'adminPage'));
 		}
 		elseif($this->type === 'public') {
-			$this->public_page();
+			$this->publicPage();
 		}
 	}
 
@@ -59,20 +65,67 @@ class Controller {
 	 * Sets up the admin page
 	 * @return void
 	 */
-	public function admin_page()
+	public function adminPage()
 	{
 		if($this->admin_page) {
-			$admin_page = \add_menu_page( $this->admin_page['page_title'], $this->admin_page['menu_title'], $this->admin_page['capability'], $this->admin_page['menu_slug'], array($this, 'render'), $this->admin_page['icon_url'], $this->admin_page['position'] );
-			add_action('admin_print_scripts-'. $admin_page, array($this, 'scripts'));
-			add_action('admin_print_styles-'. $admin_page, array($this, 'styles'));
+			$admin_page = $this->addAdminPage($this->admin_page);
+			if($this->admin_sub_pages) {
+				foreach($this->admin_sub_pages as $page) {
+					$this->addAdminPage($page, $admin_page);
+				}
+			}
 		}
+	}
+
+	/**
+	 * Adds a new admin page
+	 * @param array $options Admin page options
+	 * @param string $parent The parent slug
+	 */
+	public function addAdminPage($options, $parent = null) {
+		$options = array_merge( array(
+			'page_title' => '', // the title of the settings page
+			'menu_title' => '', // the title of the settings menu item
+			'capability' => 'edit_posts', // the required capability
+			'menu_slug'  => '', // the menu slug
+			'icon_url'   => '', // the icon
+			'position'   => 30, // the menu position
+			'content'    => '' // the content of the page.
+		), $options );
+
+		if(!$parent) {
+			$page = \add_menu_page(
+				$options['page_title'],
+				$options['menu_title'],
+				$options['capability'],
+				Framework::getSlug() . '-'. $options['menu_slug'],
+				array($this, 'render'),
+				$options['icon_url'],
+				$options['position']
+			);
+		} else {
+			$parent = Framework::getSlug() . '-' . $parent;
+			$page = \add_submenu_page(
+				$parent,
+				$options['page_title'],
+				$options['menu_title'],
+				$options['capability'],
+				Framework::getSlug() . '-'. $options['menu_slug'],
+				array($this, 'render')
+			);
+		}
+
+		add_action('admin_print_scripts-'. $page, array($this, 'scripts'));
+		add_action('admin_print_styles-'. $page, array($this, 'styles'));
+		$this->admin_pages[$options['menu_slug']] = $options;
+		return $options['menu_slug'];
 	}
 
 	/**
 	 * Sets up the public page actions
 	 * @return void
 	 */
-	public function public_page()
+	public function publicPage()
 	{
 		add_action('wp_enqueue_scripts', array($this, 'scripts'));
 		add_action('wp_print_styles', array($this, 'styles'));
@@ -108,7 +161,64 @@ class Controller {
 	 * @return mixed
 	 */
 	public function render() {
+		$page = str_replace( Framework::getSlug() . '-', '', isset($_REQUEST['page']) ? $_REQUEST['page'] : '');
+		$options = isset($this->admin_pages[$page]) ? $this->admin_pages[$page] : array();
+
+		if(is_array($options['content'])) {
+			return $this->renderApi($options['content']);
+		} elseif(is_object($options['content']) && ($options['content'] instanceof Closure)) {
+			return $this->renderFunction($options['content']);
+		} elseif(is_string($options['content']) && $this->isViewPath($options['current'])) {
+			return $this->renderFile($options['content']);
+		} else {
+			return $this->renderContent($options['content']);
+		}
+	}
+
+	/**
+	 * Render a file
+	 * @return mixed
+	 */
+	public function renderContent($content) {
+		echo '<div class="wrap">'. $content . '</div>';
+	}
+
+	/**
+	 * Render a file
+	 * @return mixed
+	 */
+	public function renderFile($content) {
+		return $this->view($content, true);
+	}
+
+	/**
+	 * Render a closure
+	 * @return mixed
+	 */
+	public function renderFunction($content) {
+		return call_user_func($content);
+	}
+
+	/**
+	 * Render a settings API
+	 * @return mixed
+	 */
+	public function renderApi($content) {
 		return '';
+	}
+
+	/**
+	 * Check if given string is a view
+	 * @param  string  $file The file name
+	 * @return boolean
+	 */
+	public function isViewPath($file) {
+		$path = Framework::getUrl() . 'resources/views/';
+		$file = $path . $file . '.php';
+		if(file_exists($file)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

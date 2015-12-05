@@ -2,6 +2,6 @@
 
 namespace Anunatak\Framework\Models;
 
-namespace WordPress\ORM\BaseModel;
+use WeDevs\ORM\Eloquent\Model as BaseModel;
 
 class Model extends BaseModel {}

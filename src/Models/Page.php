@@ -2,6 +2,6 @@
 
 namespace Anunatak\Framework\Models;
 
-namespace WordPress\ORM\Model\Page as PageModel;
+namespace WeDevs\ORM\WP\Page as PageModel;
 
 class Page extends PageModel {}

@@ -22,11 +22,11 @@ final class Framework {
 	{
 		self::$options = array_merge(array(
 			'text_domain' => 'anunaframework',
-			'namespace' => __NAMESPACE__,
-			'file' => __FILE__,
-			'dir' => __DIR__,
-			'version' => '1.0.0',
-			'slug' => 'anunaframework'
+			'namespace'   => __NAMESPACE__,
+			'file'        => __FILE__,
+			'dir'         => __DIR__,
+			'version'     => '1.0.0',
+			'slug'        => 'anunaframework'
 		), $options);
 	}
 

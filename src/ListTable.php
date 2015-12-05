@@ -113,9 +113,9 @@ class ListTable extends \WP_List_Table
      */
     public static function get_data($orderby = 'id', $order = 'desc', $per_page = 5, $page = 1)
     {
-        $me = new static;
-    	$skip = $page !== 1 ? $per_page * ($page - 1) : 0;
-        $data = array();
+        $me    = new static;
+        $skip  = $page !== 1 ? $per_page * ($page - 1) : 0;
+        $data  = array();
         $model = $me->get_model();
         if($this->search) {
             $model->where($this->options['search_column'], 'LIKE', $this->search);
