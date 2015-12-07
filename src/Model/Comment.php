@@ -1,6 +1,6 @@
 <?php
 
-namespace Anunatak\Framework\Models;
+namespace Anunatak\Framework\Model;
 
 namespace WeDevs\ORM\WP\Comment as CommentModel;
 

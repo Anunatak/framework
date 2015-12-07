@@ -134,7 +134,7 @@ class Router {
 	 * @return Anunatak\AnunaFramework\Fakes\WP_Post
 	 */
 	private function setup_page($route) {
-		$post = new Fakes\WP_Post;
+		$post = new Fake\WP_Post;
 		$post->ID = -99;
 		$post->post_title = $route['title'];
 		$post->post_type ='page';
