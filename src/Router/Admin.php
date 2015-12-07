@@ -1,6 +1,6 @@
 <?php
 
-namespace Anunatak\Framework;
+namespace Anunatak\Framework\Router;
 
 /**
  * Admin Routing

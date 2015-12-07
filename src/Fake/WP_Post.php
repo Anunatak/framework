@@ -1,6 +1,6 @@
 <?php
 
-namespace Anunatak\Framework\Fakes;
+namespace Anunatak\Framework\Fake;
 
 /**
  * A fake WP_Post object.

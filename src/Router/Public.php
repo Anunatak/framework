@@ -1,13 +1,15 @@
 <?php
 
-namespace Anunatak\Framework;
+namespace Anunatak\Framework\Router;
+
+use Anunatak\Framework\Fake\WP_Post;
 
 /**
  * Routing
  * Creates a fake page for GET-requests, and appends content to it.
  * Processes POST-requests and halts further execution, meaning you have to redirect after your request.
  */
-class Router {
+class PublicRouter {
 
 	/**
 	 * Contains all defined routes
@@ -134,7 +136,7 @@ class Router {
 	 * @return Anunatak\AnunaFramework\Fakes\WP_Post
 	 */
 	private function setup_page($route) {
-		$post = new Fake\WP_Post;
+		$post = new WP_Post;
 		$post->ID = -99;
 		$post->post_title = $route['title'];
 		$post->post_type ='page';
