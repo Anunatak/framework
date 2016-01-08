@@ -2,6 +2,7 @@
 
 namespace Anunatak\Framework\Router;
 
+use Anunatak\Framework\Framework;
 /**
  * Admin Routing
  * Used to create admin pages via controllers

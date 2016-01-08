@@ -52,7 +52,7 @@ class Controller {
 	 */
 	public function __construct($router = null)
 	{
-		$this->assets_path = Framework::getUrl() . 'resources/assets/';
+		$this->assets_path = Framework::getUrl() . 'public/';
 		if($this->type === 'admin') {
 			add_action('admin_menu', array($this, 'adminPage'));
 		}

@@ -3,6 +3,7 @@
 namespace Anunatak\Framework\Router;
 
 use Anunatak\Framework\Fake\WP_Post;
+use Anunatak\Framework;
 
 /**
  * Routing

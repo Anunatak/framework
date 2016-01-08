@@ -1,5 +1,8 @@
+# Composer Ignores
 composer.phar
 composer.lock
 vendor
+
+# API Docs
 api
 cache
