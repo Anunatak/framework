@@ -11,16 +11,22 @@ final class Framework {
 	 * Holds the options
 	 * @var array
 	 */
-	private static $options = array();
+	private $options = array();
+
+	/**
+	 * App Container
+	 * @var Pimple\Container
+	 */
+	private $container;
 
 	/**
 	 * Initialize the framework
 	 * @param  array  $options Options
 	 * @return void
 	 */
-	public static function initialize(array $options)
+	public function __construct(array $options)
 	{
-		self::$options = array_merge(array(
+		$this->options = array_merge(array(
 			'text_domain' => 'anunaframework',
 			'namespace'   => __NAMESPACE__,
 			'file'        => __FILE__,
@@ -28,44 +34,53 @@ final class Framework {
 			'version'     => '1.0.0',
 			'slug'        => 'anunaframework'
 		), $options);
+
+		$this->container = new Container( $this );
+	}
+
+	/**
+	 * Get the app container
+	 * @return Pimple\Container
+	 */
+	public function container() {
+		return $this->container;
 	}
 
 	/**
 	 * Get the textdomain
 	 * @return string
 	 */
-	public static function getTextDomain()
+	public function getTextDomain()
 	{
-		return static::$options['text_domain'];
+		return $this->options['text_domain'];
 	}
 
 	/**
 	 * Get the slug
 	 * @return string
 	 */
-	public static function getSlug()
+	public function getSlug()
 	{
-		return static::$options['slug'];
+		return $this->options['slug'];
 	}
 
 	/**
 	 * Get the version
 	 * @return string
 	 */
-	public static function getVersion()
+	public function getVersion()
 	{
-		return static::$options['version'];
+		return $this->options['version'];
 	}
 
 	/**
 	 * Get the plugin URL
 	 * @return string
 	 */
-	public static function getUrl()
+	public function getUrl()
 	{
-		$url = plugins_url( '/' );
-		$path = basename(self::getPath());
-
+		$url  = plugins_url( '/' );
+		$path = basename($this->getPath());
 		return trailingslashit($url . $path);
 	}
 
@@ -73,10 +88,10 @@ final class Framework {
 	 * Get the plugin path
 	 * @return string
 	 */
-	public static function getPath()
+	public function getPath()
 	{
-		$file = static::$options['file'];
-		$dir = static::$options['dir'];
+		$file = $this->options['file'];
+		$dir  = $this->options['dir'];
 		$path = trailingslashit( str_replace( basename( dirname( $file ) ), '', $dir ) );
 		return $path;
 	}
@@ -85,9 +100,9 @@ final class Framework {
 	 * Get the plugin namespace
 	 * @return string
 	 */
-	public static function getNamespace()
+	public function getNamespace()
 	{
-		return static::$options['namespace'];
+		return $this->options['namespace'];
 	}
 
 	/**
@@ -100,30 +115,8 @@ final class Framework {
 	 * @param  boolean $isGlobal If the module is part of the framework
 	 * @return object            An instance of the module
 	 */
-	public static function make($module, $args = array(), $isGlobal = true) {
-		$module = ucfirst($module); // make sure the module is upper case first
-
-		// for the list table module we'll need to load one WP dependency
-		if($module === 'ListTable') {
-			if( !class_exists( 'WP_List_Table' ) )
-				require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-		}
-
-		if($isGlobal) {
-			$namespace = __NAMESPACE__;
-		}
-		else {
-			$namespace = self::getNamespace();
-		}
-
-		$class = $namespace . '\\' . $module;
-	 	if (!empty($args)) {
-			$rc = new \ReflectionClass($name);
-			$instance = $rc->newInstanceArgs($args);
-		}
-		else {
-			$instance = new $class();
-		}
+	public function make($module) {
+		$instance = $this->container->make($module);
 		return $instance;
 	}
 

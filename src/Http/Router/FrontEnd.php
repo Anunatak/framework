@@ -1,16 +1,21 @@
 <?php
 
-namespace Anunatak\Framework\Router;
+namespace Anunatak\Framework\Http\Router;
 
 use Anunatak\Framework\Fake\WP_Post;
-use Anunatak\Framework;
+use Anunatak\Framework\Framework;
 
 /**
  * Routing
  * Creates a fake page for GET-requests, and appends content to it.
  * Processes POST-requests and halts further execution, meaning you have to redirect after your request.
  */
-class PublicRouter {
+class FrontEnd {
+
+	/**
+	 * Holds the Framework
+	 */
+	protected $framework;
 
 	/**
 	 * Contains all defined routes
@@ -31,14 +36,63 @@ class PublicRouter {
 	private $router;
 
 	/**
+	 * Twig Instance
+	 * @var Router
+	 */
+	protected $twig;
+
+	/**
 	 * Load up WordPress-actions
 	 */
-	public function __construct() {
+	public function __construct(Framework $framework) {
+		$this->framework = $framework;
+	}
+
+	public function init() {
 		add_action('wp', array($this, 'load_routes'), 10);
 		add_filter('the_content', array($this, 'load_content'), 20, 1);
 
 		// instantiate altorouter
 		$this->router = new \AltoRouter();
+
+		$this->twig = $this->framework->make('twig');
+	}
+
+	/**
+	 * Check if given string is a view
+	 * @param  string  $file The file name
+	 * @return boolean
+	 */
+	public function isViewPath($file) {
+		$path = $this->framework->getUrl() . 'resources/views/';
+		$file = $path . $file . '.php';
+		if(file_exists($file)) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Gets a view from the resource folder
+	 * @param  string $file View to get
+	 * @return [type]       [description]
+	 */
+	public function view($file, $data = array(), $echo = false) {
+		$path = $this->framework->getPath() . 'resources/views/';
+		$filename = $path . $file;
+		if(!file_exists($filename)) {
+			$view =  __( 'View does not exist.', $this->framework->getTextDomain() );
+		}
+		else {
+			$view = $this->twig->render($file, $data);
+		}
+
+		if($echo) {
+			echo $view;
+		}
+		else {
+			return $view;
+		}
 	}
 
 	public function set_title($title) {

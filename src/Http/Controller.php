@@ -1,8 +1,20 @@
 <?php
 
-namespace Anunatak\Framework;
+namespace Anunatak\Framework\Http;
+
+use Anunatak\Framework\Framework;
 
 class Controller {
+
+	/**
+	 * Holds the Framework
+	 */
+	protected $framework;
+
+	/**
+	 * Holds the Request
+	 */
+	protected $request;
 
 	/**
 	 * Path to the assets
@@ -47,18 +59,29 @@ class Controller {
 	protected $styles = array();
 
 	/**
+	 * Holds the Twig instance
+	 * @var null
+	 */
+	protected $twig = null;
+
+	/**
 	 * Set up the controller
 	 * @param mixed $router Router or null
 	 */
-	public function __construct($router = null)
+	public function __construct($router = null, Framework $framework)
 	{
-		$this->assets_path = Framework::getUrl() . 'public/';
+		$this->framework   = $framework;
+		$this->request     = $framework->make('request');
+		$this->assets_path = $this->framework->getUrl() . 'public/';
+
 		if($this->type === 'admin') {
 			add_action('admin_menu', array($this, 'adminPage'));
 		}
 		elseif($this->type === 'public') {
 			$this->publicPage();
 		}
+
+		$this->twig = $this->framework->make('twig');
 	}
 
 	/**
@@ -98,19 +121,19 @@ class Controller {
 				$options['page_title'],
 				$options['menu_title'],
 				$options['capability'],
-				Framework::getSlug() . '-'. $options['menu_slug'],
+				$this->framework->getSlug() . '-'. $options['menu_slug'],
 				array($this, 'render'),
 				$options['icon_url'],
 				$options['position']
 			);
 		} else {
-			$parent = Framework::getSlug() . '-' . $parent;
+			$parent = $this->framework->getSlug() . '-' . $parent;
 			$page = \add_submenu_page(
 				$parent,
 				$options['page_title'],
 				$options['menu_title'],
 				$options['capability'],
-				Framework::getSlug() . '-'. $options['menu_slug'],
+				$this->framework->getSlug() . '-'. $options['menu_slug'],
 				array($this, 'render')
 			);
 		}
@@ -139,7 +162,7 @@ class Controller {
 	public function scripts() {
 		if($this->scripts) {
 			foreach($this->scripts as $script => $deps) {
-				wp_enqueue_script( Framework::getSlug() . '-' . $script, $this->assets_path . 'js/'. $script .'.js', $deps, Framework::getVersion() );
+				wp_enqueue_script( $this->framework->getSlug() . '-' . $script, $this->assets_path . 'js/'. $script .'.js', $deps, $this->framework->getVersion() );
 			}
 		}
 	}
@@ -151,7 +174,7 @@ class Controller {
 	public function styles() {
 		if($this->styles) {
 			foreach($this->styles as $style) {
-				wp_enqueue_style( Framework::getSlug() . '-' . $style, $this->assets_path . 'js/'. $script .'.js', array(), Framework::getVersion() );
+				wp_enqueue_style( $this->framework->getSlug() . '-' . $style, $this->assets_path . 'js/'. $script .'.js', array(), $this->framework->getVersion() );
 			}
 		}
 	}
@@ -161,14 +184,14 @@ class Controller {
 	 * @return mixed
 	 */
 	public function render() {
-		$page = str_replace( Framework::getSlug() . '-', '', isset($_REQUEST['page']) ? $_REQUEST['page'] : '');
+		$page = str_replace( $this->framework->getSlug() . '-', '', isset($_REQUEST['page']) ? $_REQUEST['page'] : '');
 		$options = isset($this->admin_pages[$page]) ? $this->admin_pages[$page] : array();
 
 		if(is_array($options['content'])) {
 			return $this->renderApi($options['content']);
 		} elseif(is_object($options['content']) && ($options['content'] instanceof Closure)) {
 			return $this->renderFunction($options['content']);
-		} elseif(is_string($options['content']) && $this->isViewPath($options['current'])) {
+		} elseif(is_string($options['content']) && $this->isViewPath($options['content'])) {
 			return $this->renderFile($options['content']);
 		} else {
 			return $this->renderContent($options['content']);
@@ -213,7 +236,7 @@ class Controller {
 	 * @return boolean
 	 */
 	public function isViewPath($file) {
-		$path = Framework::getUrl() . 'resources/views/';
+		$path = $this->framework->getUrl() . 'resources/views/';
 		$file = $path . $file . '.php';
 		if(file_exists($file)) {
 			return true;
@@ -226,17 +249,15 @@ class Controller {
 	 * @param  string $file View to get
 	 * @return [type]       [description]
 	 */
-	public function view($file, $echo = true) {
-		$path = Framework::getUrl() . 'resources/views/';
-		$file = $path . $file . '.php';
+	public function view($file, $data = array(), $echo = false) {
+		$path = $this->framework->getUrl() . 'resources/views/';
+		$filename = $path . $file . '.php';
 
-		if(!file_exists($file)) {
-			$view =  __( 'View does not exist.', Framework::getTextDomain() );
+		if(!file_exists($filename)) {
+			$view =  __( 'View does not exist.', $this->framework->getTextDomain() );
 		}
 		else {
-			ob_start();
-			include $file;
-			$view = ob_get_clean();
+			$view = $this->twig->render($file, $data);
 		}
 
 		if($echo) {

@@ -1,9 +1,17 @@
 <?php
 
-namespace Anunatak\Framework;
+namespace Anunatak\Framework\Content;
+
+use Anunatak\Framework\Framework;
 
 class ListTable extends \WP_List_Table
 {
+
+    /**
+     * Holds the Framework
+     */
+    protected $framework;
+
     /**
      * Order
      * @var string
@@ -75,12 +83,12 @@ class ListTable extends \WP_List_Table
      * @param array $options The options for the table
      * @param string $slug The slug
      */
-    public function __construct()
+    public function __construct(Framework $framework)
     {
-
+        $this->framework = $framework;
     }
 
-    public function initiate($model, array $options, array $columns, array $sortable_columns, $slug)
+    public function init($model, array $options, array $columns, array $sortable_columns, $slug)
     {
         $this->model            = $model;
         $this->options          = array_merge(array(

@@ -11,6 +11,9 @@
         "altorouter/altorouter": "1.1.0",
         "twig/twig": "~1.0",
         "tareq1988/wordpress-settings-api-class": "dev-master",
-        "jjgrainger/wp-custom-post-type-class": "dev-master"
+        "jjgrainger/wp-custom-post-type-class": "dev-master",
+        "pimple/pimple": "^3.0",
+        "symfony/http-foundation": "^3.0",
+        "php-di/php-di": "^5.2"
     }
 }

@@ -1,13 +1,18 @@
 <?php
 
-namespace Anunatak\Framework\Router;
+namespace Anunatak\Framework\Http\Router;
 
 use Anunatak\Framework\Framework;
 /**
  * Admin Routing
  * Used to create admin pages via controllers
  */
-class AdminRouter {
+class BackEnd {
+
+	/**
+	 * Holds the Framework
+	 */
+	protected $framework;
 
 	/**
 	 * Holds all the controllers
@@ -18,8 +23,11 @@ class AdminRouter {
 	/**
 	 * Set up everything
 	 */
-	public function __construct()
-	{
+	public function __construct(Framework $framework) {
+		$this->framework = $framework;
+	}
+
+	public function init() {
 		add_action('init', array($this, 'load_routes'));
 	}
 
@@ -39,7 +47,9 @@ class AdminRouter {
 	 * @param string $controller Controller Name
 	 */
 	public function add($controller) {
-		$this->controllers[] = Framework::make($controller, array(), false);
+		$namespace = $this->framework->getNamespace();
+		$controller = $namespace . '\\' . $controller;
+		$this->controllers[] = new $controller($this, $this->framework);
 	}
 
 
