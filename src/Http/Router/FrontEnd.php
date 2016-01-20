@@ -132,11 +132,11 @@ class FrontEnd {
 				$wp_query->found_posts = 1;
 				$wp_query->post_count = 1;
 				$wp_query->max_num_pages = 1;
-				$wp_query->is_single = 1;
+				$wp_query->is_single = false;
+				$wp_query->is_page = true;
 				$wp_query->is_404 = false;
 				$wp_query->is_posts_page = 1;
 				$wp_query->posts = array($post);
-				$wp_query->page = false;
 				$wp_query->is_post = false;
 				$wp_query->page = true;
 				status_header(200);
