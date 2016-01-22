@@ -2,7 +2,7 @@
 
 Ajax responses are made very simple in this framework.
 
-## Response
+## Usage
 
 Each response is paired with a `Request` object, which comes from the Symfony Http Foundation package. This makes it really easy to handle your ajax responses.
 
