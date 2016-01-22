@@ -17,6 +17,11 @@ class Controller {
 	protected $request;
 
 	/**
+	 * Holds the Router
+	 */
+	protected $router;
+
+	/**
 	 * Path to the assets
 	 * @var string
 	 */
@@ -26,7 +31,7 @@ class Controller {
 	 * The type of controller
 	 * @var string
 	 */
-	protected $type;
+	protected $type = 'public';
 
 	/**
 	 * Settings for the admin page
@@ -73,6 +78,7 @@ class Controller {
 		$this->framework   = $framework;
 		$this->request     = $framework->make('request');
 		$this->assets_path = $this->framework->getUrl() . 'public/';
+		$this->router      = $router;
 
 		if($this->type === 'admin') {
 			add_action('admin_menu', array($this, 'adminPage'));
@@ -250,8 +256,8 @@ class Controller {
 	 * @return [type]       [description]
 	 */
 	public function view($file, $data = array(), $echo = false) {
-		$path = $this->framework->getUrl() . 'resources/views/';
-		$filename = $path . $file . '.php';
+		$path = $this->framework->getPath() . 'resources/views/';
+		$filename = $path . $file;
 
 		if(!file_exists($filename)) {
 			$view =  __( 'View does not exist.', $this->framework->getTextDomain() );

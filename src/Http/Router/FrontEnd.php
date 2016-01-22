@@ -95,7 +95,7 @@ class FrontEnd {
 		}
 	}
 
-	public function set_title($title) {
+	public function setTitle($title) {
 		$this->current_route['title'] = $title;
 
 		return $title;
@@ -232,8 +232,12 @@ class FrontEnd {
 	 * @return void
 	 */
 	public function add($method, $route, $title, $function = null) {
-		if($function === null && ($title instanceof \Closure)) {
+		if($function === null) {
 			$function = $title;
+			$class = explode('@', $function);
+			$class_name = $this->framework->getNameSpace() . '\Controllers\\'. $class[0];
+			$object = new $class_name($this, $this->framework);
+			$function = array($object, $class[1]);
 			$title = null;
 		}
 		$name = $this->sanitize_function($route);

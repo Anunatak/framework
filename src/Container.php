@@ -83,7 +83,7 @@ class Container {
 	 */
 	protected function registerTwigEnviroment($c) {
 		return new \Twig_Environment($c['twig_loader'], array(
-			'cache'       => WP_CONTENT_DIR . '/twig_cache/',
+			'cache'       => WP_CONTENT_DIR . '/.twig_cache/',
 			'auto_reload' => true,
 			'debug'       => defined('WP_DEBUG') ? WP_DEBUG : false
 		));
